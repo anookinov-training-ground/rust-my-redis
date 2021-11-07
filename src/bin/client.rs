@@ -53,16 +53,19 @@ async fn main() {
     let t1 = tokio::spawn(async move {
         let (resp_tx, resp_rx) = oneshot::channel();
         let cmd = Command::Get {
-            key: "hello".to_string(),
+            key: "foo".to_string(),
             resp: resp_tx,
         };
 
         // Send the GET request
-        tx.send(cmd).await.unwrap();
+        if tx.send(cmd).await.is_err() {
+            eprintln!("connection task shutdown");
+            return;
+        }
 
         // Await the response
         let res = resp_rx.await;
-        println!("GOT = {:?}", res);
+        println!("GOT (Get) = {:?}", res);
     });
 
     let t2 = tokio::spawn(async move {
@@ -74,11 +77,14 @@ async fn main() {
         };
 
         // Send the SET request
-        tx2.send(cmd).await.unwrap();
+        if tx2.send(cmd).await.is_err() {
+            eprintln!("connection task shutdown");
+            return;
+        }
 
         // Await the response
         let res = resp_rx.await;
-        println!("GOT = {:?}", res);
+        println!("GOT (Set) = {:?}", res);
     });
 
     t1.await.unwrap();
