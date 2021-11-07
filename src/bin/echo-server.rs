@@ -1,6 +1,20 @@
 use tokio::io::{self, AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpListener;
 
+// struct Task {
+//     // internal task fields here
+//     task: enum {
+//         AwaitingRead {
+//             socket: TcpStream,
+//             buf: [BufferType],
+//         },
+//         AwaitingWriteAll {
+//             socket: TcpStream,
+//             buf: [BufferType],
+//         }
+//     }
+// }
+
 #[tokio::main]
 async fn main() -> io::Result<()> {
     let listener = TcpListener::bind("127.0.0.1:6142").await?;
